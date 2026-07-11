@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Vanguard - Galactic Space Shooter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Canvas for rendering parallax background and gameplay -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- UI Overlay Wrapper -->
+    <div class="ui-overlay">
+        
+        <!-- ================= START SCREEN ================= -->
+        <div id="start-screen" class="screen interactive">
+            <div>
+                <h1>COSMIC VANGUARD</h1>
+                <p>Annihilate the alien invaders, gather star dust, and forge the ultimate starship.</p>
+            </div>
+
+            <div>
+                <h2>Select Your Fighter</h2>
+                <div class="ship-grid">
+                    <!-- Phoenix -->
+                    <div class="ship-card selected" data-ship="phoenix" style="--ship-glow: var(--neon-magenta)">
+                        <div class="ship-preview">
+                            <svg viewBox="0 0 60 60" width="100%" height="100%">
+                                <polygon points="30,5 15,45 30,35 45,45" fill="none" stroke="var(--neon-magenta)" stroke-width="2" />
+                                <polygon points="30,12 20,40 30,32 40,40" fill="var(--neon-magenta)" opacity="0.3" />
+                                <line x1="30" y1="35" x2="30" y2="55" stroke="var(--neon-orange)" stroke-width="3" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>PHOENIX</h3>
+                        <div class="ship-stats">
+                            <div class="stat-row">
+                                <span>Speed</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 90%; background: var(--neon-magenta);"></div></div>
+                            </div>
+                            <div class="stat-row">
+                                <span>Attack</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 50%; background: var(--neon-magenta);"></div></div>
+                            </div>
+                            <div class="stat-row">
+                                <span>Shields</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 40%; background: var(--neon-magenta);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Titan -->
+                    <div class="ship-card" data-ship="titan" style="--ship-glow: var(--neon-cyan)">
+                        <div class="ship-preview">
+                            <svg viewBox="0 0 60 60" width="100%" height="100%">
+                                <polygon points="30,10 5,30 15,50 30,42 45,50 55,30" fill="none" stroke="var(--neon-cyan)" stroke-width="2" />
+                                <polygon points="30,16 12,32 20,45 30,38 40,45 48,32" fill="var(--neon-cyan)" opacity="0.3" />
+                                <line x1="18" y1="45" x2="18" y2="55" stroke="var(--neon-orange)" stroke-width="2" />
+                                <line x1="42" y1="45" x2="42" y2="55" stroke="var(--neon-orange)" stroke-width="2" />
+                            </svg>
+                        </div>
+                        <h3>TITAN</h3>
+                        <div class="ship-stats">
+                            <div class="stat-row">
+                                <span>Speed</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 40%; background: var(--neon-cyan);"></div></div>
+                            </div>
+                            <div class="stat-row">
+                                <span>Attack</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 90%; background: var(--neon-cyan);"></div></div>
+                            </div>
+                            <div class="stat-row">
+                                <span>Shields</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 80%; background: var(--neon-cyan);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Specter -->
+                    <div class="ship-card" data-ship="specter" style="--ship-glow: var(--neon-green)">
+                        <div class="ship-preview">
+                            <svg viewBox="0 0 60 60" width="100%" height="100%">
+                                <path d="M 30,5 Q 12,25 20,48 L 30,42 L 40,48 Q 48,25 30,5 Z" fill="none" stroke="var(--neon-green)" stroke-width="2" />
+                                <path d="M 30,12 Q 18,28 24,42 L 30,37 L 36,42 Q 42,28 30,12 Z" fill="var(--neon-green)" opacity="0.3" />
+                                <circle cx="30" cy="28" r="5" fill="none" stroke="var(--neon-cyan)" stroke-width="1.5" />
+                            </svg>
+                        </div>
+                        <h3>SPECTER</h3>
+                        <div class="ship-stats">
+                            <div class="stat-row">
+                                <span>Speed</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 70%; background: var(--neon-green);"></div></div>
+                            </div>
+                            <div class="stat-row">
+                                <span>Attack</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 65%; background: var(--neon-green);"></div></div>
+                            </div>
+                            <div class="stat-row">
+                                <span>Shields</span>
+                                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 65%; background: var(--neon-green);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-launch" class="btn btn-primary">LAUNCH MISSION</button>
+        </div>
+
+        <!-- ================= HUD (IN-GAME SCREEN) ================= -->
+        <div id="hud-container" class="hidden">
+            <div class="hud-top">
+                <div class="hud-left">
+                    <!-- Hull / HP Bar -->
+                    <div class="hud-panel">
+                        <div class="hud-bar-container">
+                            <div class="hud-bar-label">
+                                <span>HULL H integrity</span>
+                                <span id="health-value">100/100</span>
+                            </div>
+                            <div class="hud-bar">
+                                <div id="health-bar" class="hud-fill hud-fill-health" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Shield Bar -->
+                    <div class="hud-panel">
+                        <div class="hud-bar-container">
+                            <div class="hud-bar-label">
+                                <span>SHIELD buffer</span>
+                                <span id="shield-value">100/100</span>
+                            </div>
+                            <div class="hud-bar">
+                                <div id="shield-bar" class="hud-fill hud-fill-shield" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hud-right">
+                    <!-- Score Counter -->
+                    <div class="hud-panel">
+                        <div>
+                            <div style="font-size: 0.75rem; font-family: var(--font-sci); color: #8c8da0;">SCORE</div>
+                            <div id="hud-score-val" class="hud-score">000,000</div>
+                        </div>
+                    </div>
+                    <!-- Stardust Coins Counter -->
+                    <div class="hud-panel">
+                        <div>
+                            <div style="font-size: 0.75rem; font-family: var(--font-sci); color: #8c8da0;">STARDUST</div>
+                            <div id="hud-coins-val" class="hud-coins">✨ 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-bottom">
+                <!-- Weapon and Bombs info -->
+                <div class="hud-panel weapon-indicator">
+                    <div>WEAPON: <span id="weapon-type-name" class="weapon-tag">Standard Blaster</span></div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span>QUANTUM BOMBS (SPACE / TAP):</span>
+                        <div class="bomb-slots">
+                            <div class="bomb-icon"></div>
+                            <div class="bomb-icon"></div>
+                            <div class="bomb-icon spent"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interaction buttons -->
+                <div style="display: flex; gap: 10px;">
+                    <div id="btn-hud-mute" class="hud-btn">🔊</div>
+                    <div id="btn-hud-pause" class="hud-btn">⏸</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAUSE SCREEN ================= -->
+        <div id="pause-screen" class="screen interactive hidden">
+            <h2>System Paused</h2>
+            <p>Engines idling. Starship shield integrity stabilized.</p>
+            <div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: 0 auto; width: 100%;">
+                <button id="btn-resume" class="btn btn-primary">Resume Flight</button>
+                <button id="btn-shop-open" class="btn btn-secondary">Upgrade Shop</button>
+                <button id="btn-restart" class="btn btn-secondary">Aborted Run (Restart)</button>
+            </div>
+        </div>
+
+        <!-- ================= UPGRADE SHOP SCREEN ================= -->
+        <div id="shop-screen" class="screen interactive hidden">
+            <div>
+                <h2>Starship Dockyard</h2>
+                <p>Modify weapon grids, engine blocks, and hull lattices using raw Cosmic Stardust.</p>
+                <div style="margin-top: 10px; font-size: 1.3rem; color: var(--neon-orange);">
+                    Current Balance: <span id="shop-balance-val">✨ 0</span>
+                </div>
+            </div>
+
+            <div class="shop-grid">
+                <!-- Max Hull Upgrade -->
+                <div class="shop-item" data-upgrade="maxHull">
+                    <div class="shop-header">
+                        <span class="shop-title">Nanite Hull Plating</span>
+                        <span class="shop-level">LVL <span id="lvl-maxHull">1/5</span></span>
+                    </div>
+                    <div class="shop-stats-desc">Increases ship maximum structural hull integrity. (+20 HP per tier)</div>
+                    <div class="shop-progress" id="progress-maxHull">
+                        <div class="shop-pip active"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                    </div>
+                    <div class="shop-buy-row">
+                        <span class="shop-price" id="price-maxHull">✨ 100</span>
+                        <button class="btn btn-secondary btn-buy" id="btn-buy-maxHull">UPGRADE</button>
+                    </div>
+                </div>
+
+                <!-- Shield Recharge Upgrade -->
+                <div class="shop-item" data-upgrade="shieldRecharge">
+                    <div class="shop-header">
+                        <span class="shop-title">Shield Flux Battery</span>
+                        <span class="shop-level">LVL <span id="lvl-shieldRecharge">1/5</span></span>
+                    </div>
+                    <div class="shop-stats-desc">Increases how quickly depleted shield buffers regenerate.</div>
+                    <div class="shop-progress" id="progress-shieldRecharge">
+                        <div class="shop-pip active"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                    </div>
+                    <div class="shop-buy-row">
+                        <span class="shop-price" id="price-shieldRecharge">✨ 150</span>
+                        <button class="btn btn-secondary btn-buy" id="btn-buy-shieldRecharge">UPGRADE</button>
+                    </div>
+                </div>
+
+                <!-- Blaster Damage Upgrade -->
+                <div class="shop-item" data-upgrade="weaponPower">
+                    <div class="shop-header">
+                        <span class="shop-title">Plasma Injectors</span>
+                        <span class="shop-level">LVL <span id="lvl-weaponPower">1/5</span></span>
+                    </div>
+                    <div class="shop-stats-desc">Increases primary laser beam damage output.</div>
+                    <div class="shop-progress" id="progress-weaponPower">
+                        <div class="shop-pip active"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                    </div>
+                    <div class="shop-buy-row">
+                        <span class="shop-price" id="price-weaponPower">✨ 200</span>
+                        <button class="btn btn-secondary btn-buy" id="btn-buy-weaponPower">UPGRADE</button>
+                    </div>
+                </div>
+
+                <!-- Attack Speed Upgrade -->
+                <div class="shop-item" data-upgrade="fireRate">
+                    <div class="shop-header">
+                        <span class="shop-title">Hypercharge Capacitor</span>
+                        <span class="shop-level">LVL <span id="lvl-fireRate">1/5</span></span>
+                    </div>
+                    <div class="shop-stats-desc">Reduces the cooldown delay between laser discharges.</div>
+                    <div class="shop-progress" id="progress-fireRate">
+                        <div class="shop-pip active"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                        <div class="shop-pip"></div>
+                    </div>
+                    <div class="shop-buy-row">
+                        <span class="shop-price" id="price-fireRate">✨ 200</span>
+                        <button class="btn btn-secondary btn-buy" id="btn-buy-fireRate">UPGRADE</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-shop-back" class="btn btn-primary" style="margin: 0 auto; max-width: 250px; width: 100%;">Return to Cockpit</button>
+        </div>
+
+        <!-- ================= GAME OVER SCREEN ================= -->
+        <div id="gameover-screen" class="screen interactive hidden">
+            <h1>MISSION FAILED</h1>
+            <p>Your ship hull disintegrated. However, your stardust quantum cores were recovered.</p>
+
+            <div style="background: rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 20px; border: 1px solid rgba(255, 0, 127, 0.2);">
+                <div style="display: flex; justify-content: space-around; font-size: 1.2rem; font-family: var(--font-sci);">
+                    <div>
+                        <div style="color: #8c8da0; font-size: 0.8rem;">FINAL SCORE</div>
+                        <div id="go-score-val" style="color: var(--neon-cyan); font-size: 1.8rem; font-weight: bold;">0</div>
+                    </div>
+                    <div>
+                        <div style="color: #8c8da0; font-size: 0.8rem;">STARDUST SAVED</div>
+                        <div id="go-coins-val" style="color: var(--neon-orange); font-size: 1.8rem; font-weight: bold;">✨ 0</div>
+                    </div>
+                    <div>
+                        <div style="color: #8c8da0; font-size: 0.8rem;">BOSSES DEFEATED</div>
+                        <div id="go-boss-val" style="color: var(--neon-green); font-size: 1.8rem; font-weight: bold;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="btn-go-shop" class="btn btn-secondary">Upgrade Fighter</button>
+                <button id="btn-go-again" class="btn btn-primary">Re-Deploy</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main Game Execution Script -->
+    <script type="module" src="game.js"></script>
+</body>
+</html>
