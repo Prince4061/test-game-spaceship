@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Cosmic Vanguard - Galactic Space Shooter</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -160,7 +160,7 @@
                 <div class="hud-panel weapon-indicator">
                     <div>WEAPON: <span id="weapon-type-name" class="weapon-tag">Standard Blaster</span></div>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <span>QUANTUM BOMBS (SPACE / TAP):</span>
+                        <span>BOMBS:</span>
                         <div class="bomb-slots">
                             <div class="bomb-icon"></div>
                             <div class="bomb-icon"></div>
@@ -170,7 +170,8 @@
                 </div>
                 
                 <!-- Interaction buttons -->
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="btn-hud-bomb" class="hud-btn bomb-hud-btn">💣</button>
                     <div id="btn-hud-mute" class="hud-btn">🔊</div>
                     <div id="btn-hud-pause" class="hud-btn">⏸</div>
                 </div>

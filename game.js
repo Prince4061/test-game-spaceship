@@ -103,12 +103,13 @@ function updatePointerPos(x, y) {
 }
 canvas.addEventListener('mousemove', (e) => {
     state.mouse.active = true;
+    state.isTouch = false;
     updatePointerPos(e.clientX, e.clientY);
 });
 canvas.addEventListener('mousedown', (e) => {
     state.mouse.isDown = true;
     if (state.screen === 'playing' && e.button === 0) {
-        // Player shoots automatically, but we can capture clicks if needed
+        // Player shoots automatically
     }
 });
 canvas.addEventListener('mouseup', () => {
@@ -123,14 +124,29 @@ canvas.addEventListener('mouseleave', () => {
 canvas.addEventListener('touchstart', (e) => {
     state.mouse.active = true;
     state.mouse.isDown = true;
+    state.isTouch = true;
     updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
-});
+    
+    // Prevent default touch behaviors (pinch zoom / pan) unless clicking overlay buttons
+    if (e.target === canvas) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
 canvas.addEventListener('touchmove', (e) => {
+    state.isTouch = true;
     updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
-});
-canvas.addEventListener('touchend', () => {
+    if (e.target === canvas) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
     state.mouse.isDown = false;
-});
+    if (e.target === canvas) {
+        e.preventDefault();
+    }
+}, { passive: false });
 
 // ================= GAME ENTITIES CLASS DEFINITIONS =================
 
@@ -344,7 +360,8 @@ class Player {
         // Mouse/Touch Tracking
         if (state.mouse.active) {
             const targetX = state.mouse.x;
-            const targetY = state.mouse.y;
+            // On mobile touch, offset the ship upwards by 65px so the finger doesn't block the ship view
+            const targetY = state.isTouch ? state.mouse.y - 65 : state.mouse.y;
             // Lerp towards cursor
             const lerpSpeed = 0.15 * speedMultiplier;
             this.x += (targetX - this.x) * lerpSpeed;
@@ -1507,6 +1524,7 @@ const btnGoAgain = document.getElementById('btn-go-again');
 
 const btnHudPause = document.getElementById('btn-hud-pause');
 const btnHudMute = document.getElementById('btn-hud-mute');
+const btnHudBomb = document.getElementById('btn-hud-bomb');
 
 // Shop values bindings
 const shopBalanceVal = document.getElementById('shop-balance-val');
@@ -1776,6 +1794,16 @@ btnHudMute.addEventListener('click', (e) => {
     sound.init();
     const isMuted = sound.toggleMute();
     btnHudMute.innerText = isMuted ? '🔇' : '🔊';
+});
+
+btnHudBomb.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fireQuantumBomb();
+});
+btnHudBomb.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    fireQuantumBomb();
 });
 
 // Start Requesting frame loops
